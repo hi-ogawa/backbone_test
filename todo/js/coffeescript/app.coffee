@@ -10,6 +10,10 @@ $ ->
       title:     ""
       completed: false
 
+    toggle: ->
+      this.save {completed: !this.get('completed')}
+    
+
   # define where to put the collection of models
   app.TodoList = Backbone.Collection.extend
     model:        app.Todo
@@ -17,7 +21,6 @@ $ ->
 
   # then generate its instance
   app.todoList = new app.TodoList()
-
 
 
 
@@ -40,7 +43,8 @@ $ ->
       this.render2()
 
       # bind events to the model
-      this.model.on "change", this.render, this
+      this.model.on "change", (-> this.render(); this.render2()), this
+      this.model.on "destroy", this.remove, this
 
 
     render: ->
@@ -52,10 +56,13 @@ $ ->
       this.$input.toggle this.editing
       this.$label.toggle !this.editing
 
+
     events:
-      "dblclick .title" : "edit"
-      "blur     .edit"  : "close"
-      "keypress .edit"  : "updateOnEnter"
+      "dblclick .title"   : "edit"
+      "keypress .edit"    : (e) -> if e.which is 13 then this.close()
+      "blur     .edit"    : "close"
+      "click    .done"    : -> this.model.toggle()
+      "click    .destroy" : -> this.model.destroy()
 
     edit: ->
       this.editing = true
@@ -68,11 +75,7 @@ $ ->
         this.model.save {title: value}
       else
         this.$input.val(this.model.title)
-      this.render2()
-          
-    updateOnEnter: (e) ->
-      if e.which is 13 then this.close()
-    
+        this.render2()
 
 
   # define a main view and its logic (controller)
@@ -102,6 +105,7 @@ $ ->
         
     newAttributes: ->
         title:     this.input.val()
+
 
   # instanciation of the view
   app.appView = new app.AppView()

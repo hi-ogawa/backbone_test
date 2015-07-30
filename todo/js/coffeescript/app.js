@@ -7,6 +7,11 @@
       defaults: {
         title: "",
         completed: false
+      },
+      toggle: function() {
+        return this.save({
+          completed: !this.get('completed')
+        });
       }
     });
     app.TodoList = Backbone.Collection.extend({
@@ -22,7 +27,11 @@
         this.render();
         this.editing = false;
         this.render2();
-        return this.model.on("change", this.render, this);
+        this.model.on("change", (function() {
+          this.render();
+          return this.render2();
+        }), this);
+        return this.model.on("destroy", this.remove, this);
       },
       render: function() {
         this.$el.html(this.template(this.model.toJSON()));
@@ -34,29 +43,35 @@
         return this.$label.toggle(!this.editing);
       },
       events: {
-        "dblclick .title": function() {
-          this.editing = true;
-          this.render2();
-          return this.$input.focus();
+        "dblclick .title": "edit",
+        "keypress .edit": function(e) {
+          if (e.which === 13) {
+            return this.close();
+          }
         },
         "blur     .edit": "close",
-        "keypress .edit": "updateOnEnter"
+        "click    .done": function() {
+          return this.model.toggle();
+        },
+        "click    .destroy": function() {
+          return this.model.destroy();
+        }
+      },
+      edit: function() {
+        this.editing = true;
+        this.render2();
+        return this.$input.focus();
       },
       close: function() {
         var value;
         this.editing = false;
         if (value = this.$input.val().trim()) {
-          this.model.save({
+          return this.model.save({
             title: value
           });
         } else {
           this.$input.val(this.model.title);
-        }
-        return this.render2();
-      },
-      updateOnEnter: function(e) {
-        if (e.which === 13) {
-          return this.close();
+          return this.render2();
         }
       }
     });

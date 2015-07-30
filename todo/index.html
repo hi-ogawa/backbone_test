@@ -26,11 +26,18 @@
     </div>
     <script id='item-template' type='text/template'>
       <div class='form-inline'>
-        <input class='toggle checkbox-inline' type='checkbox'>
+        <a class='done btn btn-default btn-sm'>
+          <% if(completed) { %>
+          <div class='glyphicon glyphicon-ok'></div>
+          <% } else { %>
+          <div class='glyphicon glyphicon-unchecked'></div>
+          <% } %>
+        </a>
         <input class='edit form-control' value='<%- title %>'>
         <label class='title'><%- title %></label>
-        <span class='completed pull-right'><%- completed %></span>
-        <a class='btn btn-default btn-sm pull-right'>delete</a>
+        <a class='destroy btn btn-default btn-sm pull-right'>
+          <div class='glyphicon glyphicon-trash'></div>
+        </a>
       </div>
     </script>
   </body>

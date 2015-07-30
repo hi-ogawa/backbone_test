@@ -36,8 +36,13 @@
     -# template for TodoView
     %script#item-template{type: "text/template"}
       .form-inline
-        %input.toggle.checkbox-inline{type: "checkbox"}
+        %a.done.btn.btn-default.btn-sm
+          <% if(completed) { %>
+          .glyphicon.glyphicon-ok
+          <% } else { %>
+          .glyphicon.glyphicon-unchecked
+          <% } %>
         %input.edit.form-control{value: "<%- title %>"}
         %label.title <%- title %>
-        %span.completed.pull-right <%- completed %>
-        %a.btn.btn-default.btn-sm.pull-right delete
+        %a.destroy.btn.btn-default.btn-sm.pull-right
+          .glyphicon.glyphicon-trash
