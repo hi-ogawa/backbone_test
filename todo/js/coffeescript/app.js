@@ -21,7 +21,27 @@
     });
     app.TodoList = Backbone.Collection.extend({
       model: app.Todo,
-      localStorage: new Backbone.LocalStorage("backbone-todo")
+      localStorage: new Backbone.LocalStorage("backbone-todo"),
+      all: function() {
+        return this.filter(function() {
+          return true;
+        });
+      },
+      completedList: function() {
+        return this.filter(function(todo) {
+          return todo.get("completed");
+        });
+      },
+      pendingList: function() {
+        return this.filter(function(todo) {
+          return !todo.get("completed");
+        });
+      },
+      sortedList: function() {
+        return this.filter(function() {
+          return true;
+        });
+      }
     });
     app.todoList = new app.TodoList();
     app.TodoView = Backbone.View.extend({
@@ -84,8 +104,28 @@
       initialize: function() {
         this.input = this.$("#new-todo");
         this.ul = this.$("#todo-list");
-        app.todoList.on("add", this.addOne, this);
-        return app.todoList.fetch();
+        app.todoList.fetch();
+        this.set = 0;
+        return this.render2();
+      },
+      render2: function() {
+        var ls;
+        this.ul.empty();
+        ls = (function() {
+          switch (this.set) {
+            case 0:
+              return app.todoList.all();
+            case 1:
+              return app.todoList.completedList();
+            case 2:
+              return app.todoList.pendingList();
+            case 3:
+              return app.todoList.sortedList();
+          }
+        }).call(this);
+        _.each(ls, this.addOne, this);
+        this.$(".sets a").removeClass("btn-warning").addClass("btn-default");
+        return this.$(".set" + this.set).removeClass("btn-default").addClass("btn-warning");
       },
       addOne: function(todo) {
         var view;
@@ -95,7 +135,23 @@
         return this.ul.append(view.$el);
       },
       events: {
-        "keypress #new-todo": "createTodoOnEnter"
+        "keypress #new-todo": "createTodoOnEnter",
+        "click .set0": function() {
+          this.set = 0;
+          return this.render2();
+        },
+        "click .set1": function() {
+          this.set = 1;
+          return this.render2();
+        },
+        "click .set2": function() {
+          this.set = 2;
+          return this.render2();
+        },
+        "click .set3": function() {
+          this.set = 3;
+          return this.render2();
+        }
       },
       createTodoOnEnter: function(e) {
         if (e.which !== 13 || this.input.val().trim() === "") {

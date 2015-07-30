@@ -22,10 +22,13 @@ $ ->
   app.TodoList = Backbone.Collection.extend
     model:        app.Todo
     localStorage: new Backbone.LocalStorage "backbone-todo"
+    all:           -> this.filter -> true
+    completedList: -> this.filter (todo) -> todo.get("completed")
+    pendingList:   -> this.filter (todo) -> !todo.get("completed")
+    sortedList:    -> this.filter -> true                            # later
 
   # then generate its instance
   app.todoList = new app.TodoList()
-
 
 
   # define a view for each todo piece
@@ -89,8 +92,29 @@ $ ->
     initialize: ->
       this.input = this.$("#new-todo")
       this.ul    = this.$("#todo-list")
-      app.todoList.on "add", this.addOne, this
+
       app.todoList.fetch()
+
+      # view variables, the single source of truth
+      this.set = 0
+
+      this.render2()
+
+
+    render2: ->
+      # filter todos
+      this.ul.empty()
+      ls = switch this.set
+             when 0 then app.todoList.all()
+             when 1 then app.todoList.completedList()
+             when 2 then app.todoList.pendingList()
+             when 3 then app.todoList.sortedList()
+      _.each ls, this.addOne, this
+
+      # change button color
+      this.$(".sets a").removeClass("btn-warning").addClass("btn-default")
+      this.$(".set#{this.set}").removeClass("btn-default").addClass("btn-warning")
+
 
     addOne: (todo) ->
       view = new app.TodoView {model: todo}
@@ -98,6 +122,11 @@ $ ->
 
     events:
       "keypress #new-todo": "createTodoOnEnter"
+      "click .set0": -> this.set = 0; this.render2() 
+      "click .set1": -> this.set = 1; this.render2() 
+      "click .set2": -> this.set = 2; this.render2() 
+      "click .set3": -> this.set = 3; this.render2() 
+
 
     # create new todo
     createTodoOnEnter: (e) ->
