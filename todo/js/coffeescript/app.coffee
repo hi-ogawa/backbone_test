@@ -12,7 +12,11 @@ $ ->
 
     toggle: ->
       this.save {completed: !this.get('completed')}
-    
+
+    validate: (attrs, options) ->
+      if attrs.title.length is 0
+        "todo title cannot be blank!"
+
 
   # define where to put the collection of models
   app.TodoList = Backbone.Collection.extend
@@ -45,7 +49,7 @@ $ ->
       # bind events to the model
       this.model.on "change", (-> this.render(); this.render2()), this
       this.model.on "destroy", this.remove, this
-
+      this.model.on "invalid", this.invalidHandle, this
 
     render: ->
       this.$el.html this.template(this.model.toJSON())
@@ -55,7 +59,6 @@ $ ->
     render2: ->
       this.$input.toggle this.editing
       this.$label.toggle !this.editing
-
 
     events:
       "dblclick .title"   : "edit"
@@ -71,11 +74,11 @@ $ ->
 
     close: ->
       this.editing = false
-      if value = this.$input.val().trim()
-        this.model.save {title: value}
-      else
-        this.$input.val(this.model.title)
-        this.render2()
+      this.model.save {title: this.$input.val().trim()}
+
+    invalidHandle: (model, error) ->
+      alert error
+      this.$input.val model.get('title')
 
 
   # define a main view and its logic (controller)

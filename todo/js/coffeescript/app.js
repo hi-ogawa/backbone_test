@@ -12,6 +12,11 @@
         return this.save({
           completed: !this.get('completed')
         });
+      },
+      validate: function(attrs, options) {
+        if (attrs.title.length === 0) {
+          return "todo title cannot be blank!";
+        }
       }
     });
     app.TodoList = Backbone.Collection.extend({
@@ -31,7 +36,8 @@
           this.render();
           return this.render2();
         }), this);
-        return this.model.on("destroy", this.remove, this);
+        this.model.on("destroy", this.remove, this);
+        return this.model.on("invalid", this.invalidHandle, this);
       },
       render: function() {
         this.$el.html(this.template(this.model.toJSON()));
@@ -63,16 +69,14 @@
         return this.$input.focus();
       },
       close: function() {
-        var value;
         this.editing = false;
-        if (value = this.$input.val().trim()) {
-          return this.model.save({
-            title: value
-          });
-        } else {
-          this.$input.val(this.model.title);
-          return this.render2();
-        }
+        return this.model.save({
+          title: this.$input.val().trim()
+        });
+      },
+      invalidHandle: function(model, error) {
+        alert(error);
+        return this.$input.val(model.get('title'));
       }
     });
     app.AppView = Backbone.View.extend({
