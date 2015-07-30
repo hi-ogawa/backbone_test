@@ -3,30 +3,42 @@
   %head
     %meta{charset: "UTF-8"}
     %title Test Backbone
+
+    -# backbone dependencies
     %script{src: "bower_components/jquery/dist/jquery.js"}
     %script{src: "bower_components/underscore/underscore.js"}
     %script{src: "bower_components/backbone/backbone.js"}
     %script{src: "bower_components/backbone.localstorage/backbone.localstorage.js"}
+
+    -# bootstrap styling
+    %link{rel: 'stylesheet', href: 'bower_components/bootstrap/dist/css/bootstrap.css'}'
+    %script{src: "bower_components/bootstrap/dist/js/bootstrap.js"}
+
+    -# app specific
     %script{src: "js/coffeescript/app.js"}
+    %link{rel: 'stylesheet', href: 'css/app.css'}
 
   %body
 
+    .container
+      .row
+        .col-xs-4
 
-    -# main view
-    #todoapp
-
-      #header
-        %h1 Todos
-        %input#new-todo{placeholder: "What needs to be done?"}
-
-      #main
-        %ul#todo-list
-
-
+          -# main view
+          #todoapp
+       
+            %h1 Todos
+            %input#new-todo.form-control{placeholder: "What needs to be done?"}
+            
+            %br  
+            %ul#todo-list.list-group
+       
+       
     -# template for TodoView
     %script#item-template{type: "text/template"}
-      .view
-        %input.toggle{type: "checkbox"}
-        %input.edit{value: "<%- title %>"}
-        %label <%- title %>
-        %span  <%- completed %>
+      .form-inline
+        %input.toggle.checkbox-inline{type: "checkbox"}
+        %input.edit.form-control{value: "<%- title %>"}
+        %span.title     <%- title %>
+        %span.completed <%- completed %>
+        %a.btn.btn-default.btn-sm.pull-right delete

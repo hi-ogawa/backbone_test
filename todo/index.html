@@ -7,24 +7,31 @@
     <script src='bower_components/underscore/underscore.js'></script>
     <script src='bower_components/backbone/backbone.js'></script>
     <script src='bower_components/backbone.localstorage/backbone.localstorage.js'></script>
+    <link href='bower_components/bootstrap/dist/css/bootstrap.css' rel='stylesheet'>'</link>
+    <script src='bower_components/bootstrap/dist/js/bootstrap.js'></script>
     <script src='js/coffeescript/app.js'></script>
+    <link href='css/app.css' rel='stylesheet'>
   </head>
   <body>
-    <div id='todoapp'>
-      <div id='header'>
-        <h1>Todos</h1>
-        <input id='new-todo' placeholder='What needs to be done?'>
-      </div>
-      <div id='main'>
-        <ul id='todo-list'></ul>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-xs-4'>
+          <div id='todoapp'>
+            <h1>Todos</h1>
+            <input class='form-control' id='new-todo' placeholder='What needs to be done?'>
+            <br>
+            <ul class='list-group' id='todo-list'></ul>
+          </div>
+        </div>
       </div>
     </div>
     <script id='item-template' type='text/template'>
-      <div class='view'>
-        <input class='toggle' type='checkbox'>
-        <input class='edit' value='<%- title %>'>
-        <label><%- title %></label>
-        <span><%- completed %></span>
+      <div class='form-inline'>
+        <input class='toggle checkbox-inline' type='checkbox'>
+        <input class='edit form-control' value='<%- title %>'>
+        <span class='title'><%- title %></span>
+        <span class='completed'><%- completed %></span>
+        <a class='btn btn-default btn-sm pull-right'>delete</a>
       </div>
     </script>
   </body>

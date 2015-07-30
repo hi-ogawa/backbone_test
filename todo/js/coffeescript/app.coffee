@@ -23,10 +23,37 @@ $ ->
   # define a view for each todo piece
   app.TodoView = Backbone.View.extend
     tagName: "li"
+    className: "list-group-item"
     template: _.template $("#item-template").html()
+
+    initialize: ->
+      this.render()
+      this.model.on "change", this.render, this
+
     render: ->
       this.$el.html this.template(this.model.toJSON())
+      this.input = this.$(".edit")
 
+    events:
+      "dblclick .title" : "edit"
+      "blur     .edit"  : "close"
+      "keypress .edit"  : "updateOnEnter"
+
+    edit: ->
+      this.$el.addClass "editing"
+      this.input.focus()      
+
+    close: ->
+      value = this.input.val().trim()
+      if value
+        this.model.save {title: value}
+      else
+        this.input.val(this.model.title)
+      this.$el.removeClass "editing"
+          
+    updateOnEnter: (e) ->
+      if e.which is 13 then this.close()
+    
 
   # define a main view and its logic (controller)
   app.AppView = Backbone.View.extend
@@ -35,17 +62,16 @@ $ ->
 
     initialize: ->
       this.input = this.$("#new-todo")
+      this.ul    = this.$("#todo-list")
       app.todoList.on "add", this.addOne, this
       app.todoList.fetch()
 
     addOne: (todo) ->
       view = new app.TodoView {model: todo}
-      view.render()
-      $("#todo-list").append view.$el
+      this.ul.append view.$el
 
     events:
       "keypress #new-todo": "createTodoOnEnter"
-      "change .toggle":     "toggleCompletion"
 
     # create new todo
     createTodoOnEnter: (e) ->
@@ -58,8 +84,6 @@ $ ->
         title:     this.input.val()
         completed: false
 
-    # toggle completion state
-    toggleCompletion: ->
 
   # instanciation of the view
   app.appView = new app.AppView()

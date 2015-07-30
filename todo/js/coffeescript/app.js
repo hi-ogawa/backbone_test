@@ -16,15 +16,48 @@
     app.todoList = new app.TodoList();
     app.TodoView = Backbone.View.extend({
       tagName: "li",
+      className: "list-group-item",
       template: _.template($("#item-template").html()),
+      initialize: function() {
+        this.render();
+        return this.model.on("change", this.render, this);
+      },
       render: function() {
-        return this.$el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.template(this.model.toJSON()));
+        return this.input = this.$(".edit");
+      },
+      events: {
+        "dblclick .title": "edit",
+        "blur     .edit": "close",
+        "keypress .edit": "updateOnEnter"
+      },
+      edit: function() {
+        this.$el.addClass("editing");
+        return this.input.focus();
+      },
+      close: function() {
+        var value;
+        value = this.input.val().trim();
+        if (value) {
+          this.model.save({
+            title: value
+          });
+        } else {
+          this.input.val(this.model.title);
+        }
+        return this.$el.removeClass("editing");
+      },
+      updateOnEnter: function(e) {
+        if (e.which === 13) {
+          return this.close();
+        }
       }
     });
     app.AppView = Backbone.View.extend({
       el: "#todoapp",
       initialize: function() {
         this.input = this.$("#new-todo");
+        this.ul = this.$("#todo-list");
         app.todoList.on("add", this.addOne, this);
         return app.todoList.fetch();
       },
@@ -33,12 +66,10 @@
         view = new app.TodoView({
           model: todo
         });
-        view.render();
-        return $("#todo-list").append(view.$el);
+        return this.ul.append(view.$el);
       },
       events: {
-        "keypress #new-todo": "createTodoOnEnter",
-        "change .toggle": "toggleCompletion"
+        "keypress #new-todo": "createTodoOnEnter"
       },
       createTodoOnEnter: function(e) {
         if (e.which !== 13 || this.input.val().trim() === "") {
@@ -52,8 +83,7 @@
           title: this.input.val(),
           completed: false
         };
-      },
-      toggleCompletion: function() {}
+      }
     });
     return app.appView = new app.AppView();
   });
