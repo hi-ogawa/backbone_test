@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Test Backbone</title>
+    <script src='bower_components/jquery/dist/jquery.js'></script>
+    <script src='bower_components/underscore/underscore.js'></script>
+    <script src='bower_components/backbone/backbone.js'></script>
+    <script src='bower_components/backbone.localstorage/backbone.localstorage.js'></script>
+    <script src='js/coffeescript/app.js'></script>
+  </head>
+  <body>
+    <div id='todoapp'>
+      <div id='header'>
+        <h1>Todos</h1>
+        <input id='new-todo' placeholder='What needs to be done?'>
+      </div>
+      <div id='main'>
+        <ul id='todo-list'></ul>
+      </div>
+    </div>
+    <script id='item-template' type='text/template'>
+      <div class='view'>
+        <input class='toggle' type='checkbox'>
+        <input class='edit' value='<%- title %>'>
+        <label><%- title %></label>
+        <span><%- completed %></span>
+      </div>
+    </script>
+  </body>
+</html>

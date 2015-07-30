@@ -1,0 +1,32 @@
+!!! 5
+%html
+  %head
+    %meta{charset: "UTF-8"}
+    %title Test Backbone
+    %script{src: "bower_components/jquery/dist/jquery.js"}
+    %script{src: "bower_components/underscore/underscore.js"}
+    %script{src: "bower_components/backbone/backbone.js"}
+    %script{src: "bower_components/backbone.localstorage/backbone.localstorage.js"}
+    %script{src: "js/coffeescript/app.js"}
+
+  %body
+
+
+    -# main view
+    #todoapp
+
+      #header
+        %h1 Todos
+        %input#new-todo{placeholder: "What needs to be done?"}
+
+      #main
+        %ul#todo-list
+
+
+    -# template for TodoView
+    %script#item-template{type: "text/template"}
+      .view
+        %input.toggle{type: "checkbox"}
+        %input.edit{value: "<%- title %>"}
+        %label <%- title %>
+        %span  <%- completed %>
