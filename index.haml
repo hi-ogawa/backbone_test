@@ -8,10 +8,15 @@
     %script{src: "bower_components/backbone/backbone.js"}
     %script{src: "bower_components/backbone-localstorage/backbone-localstorage.js"}
     %script{src: "js/coffeescript/app.js"}
-    -# %script{src: "js/typescript/app.js"}
 
   %body
     
+    %script#template0{type: "text/template"}
+      %label <%= label_var %>
+      %label Search
+      %input 
+
+
     #container
       Loading...
       

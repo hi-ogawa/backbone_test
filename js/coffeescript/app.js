@@ -4,11 +4,16 @@
     var AppView, appView;
     AppView = Backbone.View.extend({
       el: '#container',
+      template: _.template($("#template0").html()),
       initialize: function() {
         return this.render();
       },
       render: function() {
-        return this.$el.html("Hello World");
+        var vars;
+        vars = {
+          label_var: "set in backbone template"
+        };
+        return this.$el.html(this.template(vars));
       }
     });
     return appView = new AppView();
