@@ -10,7 +10,6 @@ $ ->
       title:     ""
       completed: false
 
-
   # define where to put the collection of models
   app.TodoList = Backbone.Collection.extend
     model:        app.Todo
@@ -20,6 +19,8 @@ $ ->
   app.todoList = new app.TodoList()
 
 
+
+
   # define a view for each todo piece
   app.TodoView = Backbone.View.extend
     tagName: "li"
@@ -27,12 +28,29 @@ $ ->
     template: _.template $("#item-template").html()
 
     initialize: ->
-      this.render()
+
+      # render the template with model data
+      # and define inner DOMs as view specific variables
+      this.render()  
+
+      # define view specific variables other than DOM (not depends on the model)
+      this.editing = false
+
+      # change binded doms depending on view specific variables
+      this.render2()
+
+      # bind events to the model
       this.model.on "change", this.render, this
+
 
     render: ->
       this.$el.html this.template(this.model.toJSON())
-      this.input = this.$(".edit")
+      this.$input = this.$(".edit")
+      this.$label = this.$(".title")
+
+    render2: ->
+      this.$input.toggle this.editing
+      this.$label.toggle !this.editing
 
     events:
       "dblclick .title" : "edit"
@@ -40,20 +58,22 @@ $ ->
       "keypress .edit"  : "updateOnEnter"
 
     edit: ->
-      this.$el.addClass "editing"
-      this.input.focus()      
+      this.editing = true
+      this.render2()
+      this.$input.focus()
 
     close: ->
-      value = this.input.val().trim()
-      if value
+      this.editing = false
+      if value = this.$input.val().trim()
         this.model.save {title: value}
       else
-        this.input.val(this.model.title)
-      this.$el.removeClass "editing"
+        this.$input.val(this.model.title)
+      this.render2()
           
     updateOnEnter: (e) ->
       if e.which is 13 then this.close()
     
+
 
   # define a main view and its logic (controller)
   app.AppView = Backbone.View.extend
@@ -82,8 +102,6 @@ $ ->
         
     newAttributes: ->
         title:     this.input.val()
-        completed: false
-
 
   # instanciation of the view
   app.appView = new app.AppView()

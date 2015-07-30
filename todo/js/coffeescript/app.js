@@ -20,32 +20,39 @@
       template: _.template($("#item-template").html()),
       initialize: function() {
         this.render();
+        this.editing = false;
+        this.render2();
         return this.model.on("change", this.render, this);
       },
       render: function() {
         this.$el.html(this.template(this.model.toJSON()));
-        return this.input = this.$(".edit");
+        this.$input = this.$(".edit");
+        return this.$label = this.$(".title");
+      },
+      render2: function() {
+        this.$input.toggle(this.editing);
+        return this.$label.toggle(!this.editing);
       },
       events: {
-        "dblclick .title": "edit",
+        "dblclick .title": function() {
+          this.editing = true;
+          this.render2();
+          return this.$input.focus();
+        },
         "blur     .edit": "close",
         "keypress .edit": "updateOnEnter"
       },
-      edit: function() {
-        this.$el.addClass("editing");
-        return this.input.focus();
-      },
       close: function() {
         var value;
-        value = this.input.val().trim();
-        if (value) {
+        this.editing = false;
+        if (value = this.$input.val().trim()) {
           this.model.save({
             title: value
           });
         } else {
-          this.input.val(this.model.title);
+          this.$input.val(this.model.title);
         }
-        return this.$el.removeClass("editing");
+        return this.render2();
       },
       updateOnEnter: function(e) {
         if (e.which === 13) {
@@ -80,8 +87,7 @@
       },
       newAttributes: function() {
         return {
-          title: this.input.val(),
-          completed: false
+          title: this.input.val()
         };
       }
     });

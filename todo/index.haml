@@ -16,7 +16,6 @@
 
     -# app specific
     %script{src: "js/coffeescript/app.js"}
-    %link{rel: 'stylesheet', href: 'css/app.css'}
 
   %body
 
@@ -39,6 +38,6 @@
       .form-inline
         %input.toggle.checkbox-inline{type: "checkbox"}
         %input.edit.form-control{value: "<%- title %>"}
-        %span.title     <%- title %>
-        %span.completed <%- completed %>
+        %label.title <%- title %>
+        %span.completed.pull-right <%- completed %>
         %a.btn.btn-default.btn-sm.pull-right delete

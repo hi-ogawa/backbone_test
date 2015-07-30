@@ -10,7 +10,6 @@
     <link href='bower_components/bootstrap/dist/css/bootstrap.css' rel='stylesheet'>'</link>
     <script src='bower_components/bootstrap/dist/js/bootstrap.js'></script>
     <script src='js/coffeescript/app.js'></script>
-    <link href='css/app.css' rel='stylesheet'>
   </head>
   <body>
     <div class='container'>
@@ -29,8 +28,8 @@
       <div class='form-inline'>
         <input class='toggle checkbox-inline' type='checkbox'>
         <input class='edit form-control' value='<%- title %>'>
-        <span class='title'><%- title %></span>
-        <span class='completed'><%- completed %></span>
+        <label class='title'><%- title %></label>
+        <span class='completed pull-right'><%- completed %></span>
         <a class='btn btn-default btn-sm pull-right'>delete</a>
       </div>
     </script>
