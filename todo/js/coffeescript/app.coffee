@@ -22,10 +22,10 @@ $ ->
   app.TodoList = Backbone.Collection.extend
     model:        app.Todo
     localStorage: new Backbone.LocalStorage "backbone-todo"
-    all:           -> this.filter -> true
+    all:           -> this.filter -> true                  # to keep the same type as others
     completedList: -> this.filter (todo) -> todo.get("completed")
     pendingList:   -> this.filter (todo) -> !todo.get("completed")
-    sortedList:    -> this.filter -> true                            # later
+    sortedList:    -> this.sortBy (todo) -> todo.get("title")
 
   # then generate its instance
   app.todoList = new app.TodoList()
@@ -93,28 +93,34 @@ $ ->
       this.input = this.$("#new-todo")
       this.ul    = this.$("#todo-list")
 
-      app.todoList.fetch()
-
       # view variables, the single source of truth
-      this.set = 0
-
+      this.set  = 0
+      this.sort = false
+    
+      app.todoList.fetch()
       this.render2()
 
 
     render2: ->
+
       # filter todos
       this.ul.empty()
       ls = switch this.set
              when 0 then app.todoList.all()
              when 1 then app.todoList.completedList()
              when 2 then app.todoList.pendingList()
-             when 3 then app.todoList.sortedList()
-      _.each ls, this.addOne, this
 
+      if this.sort
+        ls = _.sortBy ls, (todo) -> todo.get 'title'
+
+      _.each ls, this.addOne, this
+  
       # change button color
       this.$(".sets a").removeClass("btn-warning").addClass("btn-default")
       this.$(".set#{this.set}").removeClass("btn-default").addClass("btn-warning")
 
+      this.$(".set3").toggleClass("btn-info", this.sort)
+                     .toggleClass("btn-default", !this.sort)
 
     addOne: (todo) ->
       view = new app.TodoView {model: todo}
@@ -122,21 +128,19 @@ $ ->
 
     events:
       "keypress #new-todo": "createTodoOnEnter"
-      "click .set0": -> this.set = 0; this.render2() 
-      "click .set1": -> this.set = 1; this.render2() 
-      "click .set2": -> this.set = 2; this.render2() 
-      "click .set3": -> this.set = 3; this.render2() 
+      "click .set0": -> this.set = 0;           this.render2() 
+      "click .set1": -> this.set = 1;           this.render2() 
+      "click .set2": -> this.set = 2;           this.render2() 
+      "click .set3": -> this.sort = !this.sort; this.render2() 
 
 
     # create new todo
     createTodoOnEnter: (e) ->
       if e.which isnt 13 or this.input.val().trim() is ""    then return
 
-      app.todoList.create this.newAttributes()
+      app.todoList.create {title: this.input.val()}
       this.input.val("")
-        
-    newAttributes: ->
-        title:     this.input.val()
+      this.render2()
 
 
   # instanciation of the view

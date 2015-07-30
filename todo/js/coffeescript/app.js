@@ -38,8 +38,8 @@
         });
       },
       sortedList: function() {
-        return this.filter(function() {
-          return true;
+        return this.sortBy(function(todo) {
+          return todo.get("title");
         });
       }
     });
@@ -104,8 +104,9 @@
       initialize: function() {
         this.input = this.$("#new-todo");
         this.ul = this.$("#todo-list");
-        app.todoList.fetch();
         this.set = 0;
+        this.sort = false;
+        app.todoList.fetch();
         return this.render2();
       },
       render2: function() {
@@ -119,13 +120,17 @@
               return app.todoList.completedList();
             case 2:
               return app.todoList.pendingList();
-            case 3:
-              return app.todoList.sortedList();
           }
         }).call(this);
+        if (this.sort) {
+          ls = _.sortBy(ls, function(todo) {
+            return todo.get('title');
+          });
+        }
         _.each(ls, this.addOne, this);
         this.$(".sets a").removeClass("btn-warning").addClass("btn-default");
-        return this.$(".set" + this.set).removeClass("btn-default").addClass("btn-warning");
+        this.$(".set" + this.set).removeClass("btn-default").addClass("btn-warning");
+        return this.$(".set3").toggleClass("btn-info", this.sort).toggleClass("btn-default", !this.sort);
       },
       addOne: function(todo) {
         var view;
@@ -149,7 +154,7 @@
           return this.render2();
         },
         "click .set3": function() {
-          this.set = 3;
+          this.sort = !this.sort;
           return this.render2();
         }
       },
@@ -157,13 +162,11 @@
         if (e.which !== 13 || this.input.val().trim() === "") {
           return;
         }
-        app.todoList.create(this.newAttributes());
-        return this.input.val("");
-      },
-      newAttributes: function() {
-        return {
+        app.todoList.create({
           title: this.input.val()
-        };
+        });
+        this.input.val("");
+        return this.render2();
       }
     });
     return app.appView = new app.AppView();
