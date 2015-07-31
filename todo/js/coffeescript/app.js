@@ -142,18 +142,6 @@
       },
       events: {
         "keypress #new-todo": "createTodoOnEnter",
-        "click .set0": function() {
-          this.set = 0;
-          return this.render2();
-        },
-        "click .set1": function() {
-          this.set = 1;
-          return this.render2();
-        },
-        "click .set2": function() {
-          this.set = 2;
-          return this.render2();
-        },
         "click .set3": function() {
           this.sort = !this.sort;
           return this.render2();
@@ -166,11 +154,31 @@
         app.todoList.create({
           title: this.input.val()
         });
-        this.input.val("");
-        return this.render2();
+        return this.input.val("");
       }
     });
-    return app.appView = new app.AppView();
+    app.appView = new app.AppView();
+    app.Router = Backbone.Router.extend({
+      routes: {
+        "filter/:query": "setFilter"
+      },
+      setFilter: function(params) {
+        console.log("app.router.params = " + params);
+        switch (params) {
+          case "all":
+            app.appView.set = 0;
+            break;
+          case "completed":
+            app.appView.set = 1;
+            break;
+          case "pending":
+            app.appView.set = 2;
+        }
+        return app.appView.render2();
+      }
+    });
+    app.router = new app.Router();
+    return Backbone.history.start();
   });
 
 }).call(this);

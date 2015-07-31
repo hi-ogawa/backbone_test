@@ -129,9 +129,6 @@ $ ->
 
     events:
       "keypress #new-todo": "createTodoOnEnter"
-      "click .set0": -> this.set = 0;           this.render2() 
-      "click .set1": -> this.set = 1;           this.render2() 
-      "click .set2": -> this.set = 2;           this.render2() 
       "click .set3": -> this.sort = !this.sort; this.render2() 
 
 
@@ -143,5 +140,23 @@ $ ->
       this.input.val("")
 
 
-  # instanciation of the view
+  # instantiate of the view
   app.appView = new app.AppView()
+
+
+  # defined router
+  app.Router = Backbone.Router.extend
+    routes:
+      "filter/:query": "setFilter"
+
+    setFilter: (params) ->
+      console.log "app.router.params = #{params}"
+      switch params
+        when "all"       then app.appView.set = 0
+        when "completed" then app.appView.set = 1
+        when "pending"   then app.appView.set = 2
+      app.appView.render2()
+
+  # instantiate router
+  app.router = new app.Router()
+  Backbone.history.start()
