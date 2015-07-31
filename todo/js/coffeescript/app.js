@@ -107,7 +107,8 @@
         this.set = 0;
         this.sort = false;
         app.todoList.fetch();
-        return this.render2();
+        this.render2();
+        return app.todoList.on("change", this.render2, this);
       },
       render2: function() {
         var ls;

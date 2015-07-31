@@ -100,6 +100,7 @@ $ ->
       app.todoList.fetch()
       this.render2()
 
+      app.todoList.on "change", this.render2, this
 
     render2: ->
 
@@ -140,7 +141,6 @@ $ ->
 
       app.todoList.create {title: this.input.val()}
       this.input.val("")
-      this.render2()
 
 
   # instanciation of the view
