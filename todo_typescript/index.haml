@@ -8,16 +8,14 @@
     %script{src: "bower_components/jquery/dist/jquery.js"}
     %script{src: "bower_components/underscore/underscore.js"}
     %script{src: "bower_components/backbone/backbone.js"}
-    -# probably, this `dot` directory name doesn't work in github page
-    -# %script{src: "bower_components/backbone.localstorage/backbone.localstorage.js"}
-    %script{src: "https://cdnjs.cloudflare.com/ajax/libs/backbone-localstorage.js/1.1.16/backbone.localStorage.js"}
+    %script{src: "bower_components/backbone.localstorage/backbone.localstorage.js"}
 
     -# bootstrap styling
     %link{rel: 'stylesheet', href: 'bower_components/bootstrap/dist/css/bootstrap.css'}'
     %script{src: "bower_components/bootstrap/dist/js/bootstrap.js"}
 
     -# app specific
-    %script{src: "js/coffeescript/app.js"}
+    %script{src: "js/app.js"}
 
   %body
 
@@ -31,17 +29,16 @@
             #header
               %span.h3 Todos
               .sets.btn-group.btn-group-sm.pull-right
-                %a.set0.btn{href: "#filter/all"} all
-                %a.set1.btn{href: "#filter/completed"} completed
-                %a.set2.btn{href: "#filter/pending"} pending
-                %a.set3.btn.pull-right sort by title
+                %a.set0.btn.btn-default{href: "#filter/all"} all
+                %a.set1.btn.btn-default{href: "#filter/completed"} completed
+                %a.set2.btn.btn-default{href: "#filter/pending"} pending
+                %a.set3.btn.btn-default sort by title
 
             %br
             %input#new-todo.form-control{placeholder: "What needs to be done?"}
             
             %br  
             %ul#todo-list.list-group
-       
        
     -# template for TodoView
     %script#item-template{type: "text/template"}

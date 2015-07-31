@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='UTF-8'>
+    <title>Test Backbone</title>
+    <script src='bower_components/jquery/dist/jquery.js'></script>
+    <script src='bower_components/underscore/underscore.js'></script>
+    <script src='bower_components/backbone/backbone.js'></script>
+    <script src='bower_components/backbone.localstorage/backbone.localstorage.js'></script>
+    <link href='bower_components/bootstrap/dist/css/bootstrap.css' rel='stylesheet'>'</link>
+    <script src='bower_components/bootstrap/dist/js/bootstrap.js'></script>
+    <script src='js/app.js'></script>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='row'>
+        <div class='col-xs-4'>
+          <div id='todoapp'>
+            <div id='header'>
+              <span class='h3'>Todos</span>
+              <div class='sets btn-group btn-group-sm pull-right'>
+                <a class='set0 btn btn-default' href='#filter/all'>all</a>
+                <a class='set1 btn btn-default' href='#filter/completed'>completed</a>
+                <a class='set2 btn btn-default' href='#filter/pending'>pending</a>
+                <a class='set3 btn btn-default'>sort by title</a>
+              </div>
+            </div>
+            <br>
+            <input class='form-control' id='new-todo' placeholder='What needs to be done?'>
+            <br>
+            <ul class='list-group' id='todo-list'></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script id='item-template' type='text/template'>
+      <div class='form-inline'>
+        <a class='done btn btn-default btn-sm'>
+          <% if(completed) { %>
+          <div class='glyphicon glyphicon-ok'></div>
+          <% } else { %>
+          <div class='glyphicon glyphicon-unchecked'></div>
+          <% } %>
+        </a>
+        <input class='edit form-control' value='<%- title %>'>
+        <label class='title'><%- title %></label>
+        <a class='destroy btn btn-default btn-sm pull-right'>
+          <div class='glyphicon glyphicon-trash'></div>
+        </a>
+      </div>
+    </script>
+  </body>
+</html>
