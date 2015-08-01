@@ -22,6 +22,7 @@ module app {
 	    this.sort = false;
 	    this.filter = Filter.All;
 
+	    todoList.fetch();
 	    this.render();
 
 	    todoList.on("change", this.render, this);
@@ -52,6 +53,7 @@ module app {
 	}
 
 	addOne(todo : Todo) {
+	    console.log(todo);
 	    var todoView = new TodoView({model: todo});
 	    this.$list.append(todoView.$el);
 	}
@@ -71,8 +73,7 @@ module app {
 	createTodoOnEnter (e : {which : number}) {
 	    var val = this.$input.val().trim();
 	    if(e.which !== 13 || val === ""){ return; }
-	    todoList.add({title: val});
-	    // todoList.create({title: val});  // for storage
+	    todoList.create({title: val});  // for storage
 	    this.$input.val("");
 	}
     }

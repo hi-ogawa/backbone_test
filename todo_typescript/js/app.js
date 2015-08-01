@@ -23,10 +23,10 @@ var app;
         Todo.prototype.completed = function () { return _super.prototype.get.call(this, "completed"); };
         // typed setter
         Todo.prototype.setTSC = function (arg) {
-            _super.prototype.set.call(this, arg);
+            _super.prototype.save.call(this, arg);
         };
-        Todo.prototype.setTitle = function (arg) { _super.prototype.set.call(this, "title", arg); };
-        Todo.prototype.setCompleted = function (arg) { _super.prototype.set.call(this, "completed", arg); };
+        Todo.prototype.setTitle = function (arg) { _super.prototype.save.call(this, "title", arg); };
+        Todo.prototype.setCompleted = function (arg) { _super.prototype.save.call(this, "completed", arg); };
         Todo.prototype.toggle = function () {
             this.setCompleted(!this.completed());
             // this.save({completed: !this.completed()});
@@ -47,12 +47,17 @@ var app;
         __extends(TodoList, _super);
         function TodoList() {
             this.model = app.Todo;
+            this.localStorage = new Backbone.LocalStorage("backbone-todo-typescript");
             _super.call(this);
-            var sampleModels = _(samples).map(function (s) {
-                return new app.Todo({ title: s[0], completed: s[1] });
-            });
-            this.set(sampleModels);
         }
+        TodoList.prototype.initialize = function () {
+            this.fetch();
+            if (this.length === 0) {
+                _(samples).each(function (s) {
+                    this.create({ title: s[0], completed: s[1] });
+                }, this);
+            }
+        };
         // `app.Filter` is in appView.ts
         TodoList.prototype.filteredList = function (f) {
             switch (f) {
@@ -158,6 +163,7 @@ var app;
             this.$list = this.$("#todo-list");
             this.sort = false;
             this.filter = Filter.All;
+            app.todoList.fetch();
             this.render();
             app.todoList.on("change", this.render, this);
             app.todoList.on("add", this.render, this);
@@ -182,6 +188,7 @@ var app;
             toggleColor(this.$(".set-sort"), "btn-info", "btn-default", this.sort);
         };
         AppView.prototype.addOne = function (todo) {
+            console.log(todo);
             var todoView = new app.TodoView({ model: todo });
             this.$list.append(todoView.$el);
         };
@@ -201,8 +208,8 @@ var app;
             if (e.which !== 13 || val === "") {
                 return;
             }
-            app.todoList.add({ title: val });
-            // todoList.create({title: val});  // for storage
+            // todoList.add({title: val});
+            app.todoList.create({ title: val }); // for storage
             this.$input.val("");
         };
         return AppView;

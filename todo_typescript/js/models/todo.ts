@@ -22,14 +22,13 @@ module app {
 
 	// typed setter
 	setTSC(arg : todoAttributes) {
-	    super.set(arg);
+	    super.save(arg);
 	}
-	setTitle(arg : string)      { super.set("title", arg); }
-	setCompleted(arg : boolean) { super.set("completed", arg); }
+	setTitle(arg : string)      { super.save("title", arg); }
+	setCompleted(arg : boolean) { super.save("completed", arg); }
 
 	toggle() {
 	    this.setCompleted(!this.completed());
-	    // this.save({completed: !this.completed()});
 	}
     }
 }

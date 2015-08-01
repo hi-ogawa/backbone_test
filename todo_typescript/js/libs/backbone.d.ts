@@ -8,6 +8,10 @@
 
 declare module Backbone {
 
+    class LocalStorage {
+	constructor(string);
+    }
+
     interface AddOptions extends Silenceable {
         at?: number;
     }

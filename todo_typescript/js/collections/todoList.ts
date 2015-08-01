@@ -8,14 +8,22 @@ module app {
     ];
 
     export class TodoList extends Backbone.Collection<Todo> {
+	localStorage: any;
+
 	constructor() {
 	    this.model = Todo;
+	    this.localStorage = new Backbone.LocalStorage("backbone-todo-typescript");
 	    super();
+	}
 
-	    var sampleModels = _(samples).map(function(s) {
-		return new app.Todo({title: s[0], completed: s[1]});
-	    });
-	    this.set(sampleModels);
+	initialize() {
+	    this.fetch();
+
+	    if(this.length === 0) {
+		_(samples).each(function(s) {
+		    this.create({title: s[0], completed: s[1]});
+		}, this);
+	    }
 	}
 
 	// `app.Filter` is in appView.ts
