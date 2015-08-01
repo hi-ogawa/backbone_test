@@ -12,6 +12,12 @@ var app;
         function Todo() {
             _super.apply(this, arguments);
         }
+        Todo.prototype.defaults = function () {
+            return {
+                title: '',
+                completed: false
+            };
+        };
         // typed getter
         Todo.prototype.title = function () { return _super.prototype.get.call(this, "title"); };
         Todo.prototype.completed = function () { return _super.prototype.get.call(this, "completed"); };
@@ -21,13 +27,6 @@ var app;
         };
         Todo.prototype.setTitle = function (arg) { _super.prototype.set.call(this, "title", arg); };
         Todo.prototype.setCompleted = function (arg) { _super.prototype.set.call(this, "completed", arg); };
-        // it seems this isn't working
-        Todo.prototype.defaults = function () {
-            return {
-                title: '',
-                completed: false
-            };
-        };
         Todo.prototype.toggle = function () {
             this.setCompleted(!this.completed());
             // this.save({completed: !this.completed()});
@@ -47,8 +46,8 @@ var app;
     var TodoList = (function (_super) {
         __extends(TodoList, _super);
         function TodoList() {
-            _super.call(this);
             this.model = app.Todo;
+            _super.call(this);
             var sampleModels = _(samples).map(function (s) {
                 return new app.Todo({ title: s[0], completed: s[1] });
             });
@@ -161,6 +160,7 @@ var app;
             this.filter = Filter.All;
             this.render();
             app.todoList.on("change", this.render, this);
+            app.todoList.on("add", this.render, this);
         }
         AppView.prototype.render = function () {
             this.$list.empty();
@@ -188,9 +188,10 @@ var app;
         AppView.prototype.events = function () {
             return {
                 "keypress #new-todo": "createTodoOnEnter",
-                "click .set-all": function () { this.filter = Filter.All; },
-                "click .set-completed": function () { this.filter = Filter.Completed; },
-                "click .set-pending": function () { this.filter = Filter.Pending; },
+                // todo filter is done via hashtag url
+                // "click .set-all"       (){ this.filter = Filter.All; },
+                // "click .set-completed" (){ this.filter = Filter.Completed; },
+                // "click .set-pending"   (){ this.filter = Filter.Pending; },
                 "click .set-sort": function () { this.sort = !this.sort; },
                 "click .sets": function () { this.render(); }
             };
@@ -200,8 +201,7 @@ var app;
             if (e.which !== 13 || val === "") {
                 return;
             }
-            app.todoList.add({ title: val, completed: false });
-            // todoList.add({title: val}); // why doesn't' this work? (defaults in todo.ts)
+            app.todoList.add({ title: val });
             // todoList.create({title: val});  // for storage
             this.$input.val("");
         };
@@ -209,11 +209,54 @@ var app;
     })(Backbone.View);
     app.AppView = AppView;
 })(app || (app = {}));
+/// <reference path='../_all.ts' />
+var app;
+(function (app) {
+    var FilterRouter = (function (_super) {
+        __extends(FilterRouter, _super);
+        function FilterRouter() {
+            _super.apply(this, arguments);
+        }
+        // to use in this way, you need to comment out `routes: any`
+        // and add `routes(): any`in backbone.d.ts
+        FilterRouter.prototype.routes = function () {
+            return {
+                "filter/:query": "jumpToFilter"
+            };
+        };
+        // you can also define routes like this (not in `initialize`, but in `constructor`):
+        // constructor() {
+        //     super({
+        // 	routes: {
+        // 	    "filter/:query": "jumpToFilter"
+        // 	}
+        //     });
+        // }
+        FilterRouter.prototype.jumpToFilter = function (query) {
+            switch (query) {
+                case "all":
+                    app.appView.filter = app.Filter.All;
+                    break;
+                case "completed":
+                    app.appView.filter = app.Filter.Completed;
+                    break;
+                case "pending":
+                    app.appView.filter = app.Filter.Pending;
+                    break;
+            }
+            app.appView.render();
+        };
+        return FilterRouter;
+    })(Backbone.Router);
+    app.FilterRouter = FilterRouter;
+})(app || (app = {}));
 /// <reference path='_all.ts' />
 var app;
 (function (app) {
     app.todoList = new app.TodoList();
     app.appView = new app.AppView();
+    new app.FilterRouter();
+    Backbone.history.start();
 })(app || (app = {}));
 /// <reference path='libs/jquery.d.ts' />
 /// <reference path='libs/underscore.d.ts' />
@@ -222,4 +265,5 @@ var app;
 /// <reference path='collections/todoList.ts' />
 /// <reference path='views/todoView.ts' />
 /// <reference path='views/appView.ts' />
+/// <reference path='routers/filter.ts' />
 /// <reference path='app.ts' />

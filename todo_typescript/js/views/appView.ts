@@ -6,7 +6,6 @@ module app {
 
     // we don't assign any model to this view, which is why I give <Backbone.Model> as a generic argument of `Backbone.View`
     export class AppView extends Backbone.View<Backbone.Model> {
-	// el = "#todoapp"; // this cannot work since this property is set after `super`
 	$input: JQuery;
 	$list: JQuery;
 	sort:   boolean;
@@ -14,7 +13,7 @@ module app {
 
 	constructor() {
 	    var options : Backbone.ViewOptions<Backbone.Model> = {
-		el: "#todoapp"
+	    	el: "#todoapp"
 	    };
 	    super(options);
 
@@ -26,6 +25,7 @@ module app {
 	    this.render();
 
 	    todoList.on("change", this.render, this);
+	    todoList.on("add", this.render, this);
 	}
 
 	render() {
@@ -59,9 +59,10 @@ module app {
 	events() {
 	    return {
 		"keypress #new-todo": "createTodoOnEnter",
-		"click .set-all"       (){ this.filter = Filter.All; },
-		"click .set-completed" (){ this.filter = Filter.Completed; },
-		"click .set-pending"   (){ this.filter = Filter.Pending; },
+		// todo filter is done via hashtag url
+		// "click .set-all"       (){ this.filter = Filter.All; },
+		// "click .set-completed" (){ this.filter = Filter.Completed; },
+		// "click .set-pending"   (){ this.filter = Filter.Pending; },
 		"click .set-sort"      (){ this.sort = !this.sort; },
 		"click .sets"          (){ this.render(); }
 	    };
@@ -70,8 +71,7 @@ module app {
 	createTodoOnEnter (e : {which : number}) {
 	    var val = this.$input.val().trim();
 	    if(e.which !== 13 || val === ""){ return; }
-	    todoList.add({title: val, completed: false});
-	    // todoList.add({title: val}); // why doesn't' this work? (defaults in todo.ts)
+	    todoList.add({title: val});
 	    // todoList.create({title: val});  // for storage
 	    this.$input.val("");
 	}

@@ -8,9 +8,8 @@ module app {
     ];
 
     export class TodoList extends Backbone.Collection<Todo> {
-	model = Todo;
-
 	constructor() {
+	    this.model = Todo;
 	    super();
 
 	    var sampleModels = _(samples).map(function(s) {
