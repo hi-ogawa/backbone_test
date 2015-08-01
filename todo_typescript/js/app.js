@@ -13,8 +13,15 @@ var app;
             _super.apply(this, arguments);
         }
         // typed getter
-        Todo.prototype.title = function () { return this.get("title"); };
-        Todo.prototype.completed = function () { return this.get("completed"); };
+        Todo.prototype.title = function () { return _super.prototype.get.call(this, "title"); };
+        Todo.prototype.completed = function () { return _super.prototype.get.call(this, "completed"); };
+        // typed setter
+        Todo.prototype.setTSC = function (arg) {
+            _super.prototype.set.call(this, arg);
+        };
+        Todo.prototype.setTitle = function (arg) { _super.prototype.set.call(this, "title", arg); };
+        Todo.prototype.setCompleted = function (arg) { _super.prototype.set.call(this, "completed", arg); };
+        // it seems this isn't working
         Todo.prototype.defaults = function () {
             return {
                 title: '',
@@ -22,7 +29,8 @@ var app;
             };
         };
         Todo.prototype.toggle = function () {
-            this.save({ completed: !this.completed() });
+            this.setCompleted(!this.completed());
+            // this.save({completed: !this.completed()});
         };
         return Todo;
     })(Backbone.Model);
@@ -32,18 +40,31 @@ var app;
 var app;
 (function (app) {
     var samples = [
-        ['drink milk', false],
-        ['eat fried rice', false],
-        ['take pills', true]
+        ['watch breaking bad', true],
+        ['take a bath', false],
+        ['go to beach', true]
     ];
     var TodoList = (function (_super) {
         __extends(TodoList, _super);
         function TodoList() {
+            _super.call(this);
+            this.model = app.Todo;
             var sampleModels = _(samples).map(function (s) {
                 return new app.Todo({ title: s[0], completed: s[1] });
             });
-            _super.call(this, sampleModels);
+            this.set(sampleModels);
         }
+        // `app.Filter` is in appView.ts
+        TodoList.prototype.filteredList = function (f) {
+            switch (f) {
+                case app.Filter.All:
+                    return this.models;
+                case app.Filter.Completed:
+                    return this.where({ completed: true });
+                case app.Filter.Pending:
+                    return this.where({ completed: false });
+            }
+        };
         return TodoList;
     })(Backbone.Collection);
     app.TodoList = TodoList;
@@ -60,57 +81,72 @@ var app;
                 className: "list-group-item"
             };
             this.template = _.template($("#item-template").html());
+            this.editing = false;
             _super.call(this, _.extend(arg, options));
             this.render();
+            // events for model change
+            this.model.on("destroy", this.remove, this);
+            this.model.on("change", this.render, this);
         }
         TodoView.prototype.render = function () {
             this.$el.html(this.template(this.model.toJSON()));
             this.$input = this.$(".edit");
             this.$label = this.$(".title");
+            this.showHideEditBox();
             return this;
+        };
+        TodoView.prototype.showHideEditBox = function () {
+            this.$input.toggle(this.editing);
+            this.$label.toggle(!this.editing);
+        };
+        TodoView.prototype.events = function () {
+            return {
+                "dblclick .title": "editTodo",
+                "keypress .edit": "finishEditOnEnter",
+                "blur     .edit": "finishEdit",
+                "click .destroy": "removeTodo",
+                "click .done": "toggleTodo"
+            };
+        };
+        TodoView.prototype.editTodo = function () {
+            this.editing = true;
+            this.showHideEditBox();
+            this.$input.focus();
+        };
+        TodoView.prototype.finishEditOnEnter = function (e) {
+            if (e.which === 13) {
+                var val = this.$input.val().trim(); //
+                if (val !== "") {
+                    this.model.setTitle(val);
+                    this.finishEdit();
+                }
+                this.$input.val(this.$label.text());
+            }
+        };
+        TodoView.prototype.finishEdit = function () {
+            this.editing = false;
+            this.showHideEditBox();
+        };
+        TodoView.prototype.removeTodo = function () {
+            this.model.destroy();
+        };
+        TodoView.prototype.toggleTodo = function () {
+            this.model.toggle();
         };
         return TodoView;
     })(Backbone.View);
     app.TodoView = TodoView;
 })(app || (app = {}));
-// initialize: ->
-//   # render the template with model data
-//   # and define inner DOMs as view specific variables
-//   this.render()  
-//   # define view specific variables other than DOM (not depends on the model)
-//   this.editing = false
-//   # change binded doms depending on view specific variables
-//   this.render2()
-//   # bind events to the model
-//   this.model.on "change", (-> this.render(); this.render2()), this
-//   this.model.on "destroy", this.remove, this
-//   this.model.on "invalid", this.invalidHandle, this
-// render: ->
-//   this.$el.html this.template(this.model.toJSON())
-//   this.$input = this.$(".edit")
-//   this.$label = this.$(".title")
-// render2: ->
-//   this.$input.toggle this.editing
-//   this.$label.toggle !this.editing
-// events:
-//   "dblclick .title"   : "edit"
-//   "keypress .edit"    : (e) -> if e.which is 13 then this.close()
-//   "blur     .edit"    : "close"
-//   "click    .done"    : -> this.model.toggle()
-//   "click    .destroy" : -> this.model.destroy()
-// edit: ->
-//   this.editing = true
-//   this.render2()
-//   this.$input.focus()
-// close: ->
-//   this.editing = false
-//   this.model.save {title: this.$input.val().trim()}
-// invalidHandle: (model, error) ->
-//   alert error
-//   this.$input.val model.get('title')
 /// <reference path='../_all.ts' />
 var app;
 (function (app) {
+    (function (Filter) {
+        Filter[Filter["All"] = 0] = "All";
+        Filter[Filter["Completed"] = 1] = "Completed";
+        Filter[Filter["Pending"] = 2] = "Pending";
+    })(app.Filter || (app.Filter = {}));
+    var Filter = app.Filter;
+    ;
     // we don't assign any model to this view, which is why I give <Backbone.Model> as a generic argument of `Backbone.View`
     var AppView = (function (_super) {
         __extends(AppView, _super);
@@ -121,21 +157,43 @@ var app;
             _super.call(this, options);
             this.$input = this.$("#new-todo");
             this.$list = this.$("#todo-list");
+            this.sort = false;
+            this.filter = Filter.All;
             this.render();
-            app.todoList.on("add", this.render, this);
+            app.todoList.on("change", this.render, this);
         }
         AppView.prototype.render = function () {
             this.$list.empty();
-            app.todoList.each(this.addOne, this);
-            // _.each(todoList.models, this.addOne, this); // same as above
+            var ls = app.todoList.filteredList(this.filter);
+            if (this.sort) {
+                ls = _.sortBy(ls, function (todo) { return todo.title(); });
+            }
+            _.each(ls, this.addOne, this);
+            this.setButtonColor();
             return this;
+        };
+        AppView.prototype.setButtonColor = function () {
+            function toggleColor($dom, c0, c1, b0) {
+                $dom.toggleClass(c0, b0).toggleClass(c1, !b0);
+            }
+            toggleColor(this.$(".set-all"), "btn-warning", "btn-default", this.filter === Filter.All);
+            toggleColor(this.$(".set-completed"), "btn-warning", "btn-default", this.filter === Filter.Completed);
+            toggleColor(this.$(".set-pending"), "btn-warning", "btn-default", this.filter === Filter.Pending);
+            toggleColor(this.$(".set-sort"), "btn-info", "btn-default", this.sort);
         };
         AppView.prototype.addOne = function (todo) {
             var todoView = new app.TodoView({ model: todo });
             this.$list.append(todoView.$el);
         };
         AppView.prototype.events = function () {
-            return { "keypress #new-todo": "createTodoOnEnter" };
+            return {
+                "keypress #new-todo": "createTodoOnEnter",
+                "click .set-all": function () { this.filter = Filter.All; },
+                "click .set-completed": function () { this.filter = Filter.Completed; },
+                "click .set-pending": function () { this.filter = Filter.Pending; },
+                "click .set-sort": function () { this.sort = !this.sort; },
+                "click .sets": function () { this.render(); }
+            };
         };
         AppView.prototype.createTodoOnEnter = function (e) {
             var val = this.$input.val().trim();
@@ -143,7 +201,8 @@ var app;
                 return;
             }
             app.todoList.add({ title: val, completed: false });
-            // todoList.add({title: val}); // why doesn't' this work?
+            // todoList.add({title: val}); // why doesn't' this work? (defaults in todo.ts)
+            // todoList.create({title: val});  // for storage
             this.$input.val("");
         };
         return AppView;

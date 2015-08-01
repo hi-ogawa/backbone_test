@@ -18,10 +18,10 @@
             <div id='header'>
               <span class='h3'>Todos</span>
               <div class='sets btn-group btn-group-sm pull-right'>
-                <a class='set0 btn btn-default' href='#filter/all'>all</a>
-                <a class='set1 btn btn-default' href='#filter/completed'>completed</a>
-                <a class='set2 btn btn-default' href='#filter/pending'>pending</a>
-                <a class='set3 btn btn-default'>sort by title</a>
+                <a class='set-all btn' href='#filter/all'>all</a>
+                <a class='set-completed btn' href='#filter/completed'>completed</a>
+                <a class='set-pending btn' href='#filter/pending'>pending</a>
+                <a class='set-sort btn'>sort by title</a>
               </div>
             </div>
             <br>
@@ -43,7 +43,7 @@
           <div class='glyphicon glyphicon-unchecked'></div>
           <% } %>
         </a>
-        <input class='edit form-control hide' value='<%- title %>'>
+        <input class='edit form-control' value='<%- title %>'>
         <label class='title'><%- title %></label>
         <a class='destroy btn btn-default btn-sm pull-right'>
           <div class='glyphicon glyphicon-trash'></div>

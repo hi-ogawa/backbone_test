@@ -2,17 +2,33 @@
 
 module app {
     var samples : (string | boolean)[][] = [
-	['drink milk', false],
-	['eat fried rice', false],
-	['take pills', true]
+	['watch breaking bad', true],
+	['take a bath', false],
+	['go to beach', true]
     ];
 
     export class TodoList extends Backbone.Collection<Todo> {
+	model = Todo;
+
 	constructor() {
+	    super();
+
 	    var sampleModels = _(samples).map(function(s) {
 		return new app.Todo({title: s[0], completed: s[1]});
 	    });
-	    super(sampleModels);
+	    this.set(sampleModels);
+	}
+
+	// `app.Filter` is in appView.ts
+	filteredList(f : Filter) {
+	    switch(f) {
+	    case Filter.All:
+		return this.models;
+	    case Filter.Completed:
+		return this.where({completed: true});
+	    case Filter.Pending:
+		return this.where({completed: false});
+	    }
 	}
     }
 }
