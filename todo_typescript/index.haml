@@ -14,8 +14,7 @@
     %link{rel: 'stylesheet', href: 'bower_components/bootstrap/dist/css/bootstrap.css'}'
     %script{src: "bower_components/bootstrap/dist/js/bootstrap.js"}
 
-    -# app specific
-    %script{src: "js/app.js"}
+    -# app specific js files are at bottom
 
   %body
 
@@ -39,6 +38,8 @@
             
             %br  
             %ul#todo-list.list-group
+              %li.list-group-item hoge
+
        
     -# template for TodoView
     %script#item-template{type: "text/template"}
@@ -49,7 +50,13 @@
           <% } else { %>
           .glyphicon.glyphicon-unchecked
           <% } %>
-        %input.edit.form-control{value: "<%- title %>"}
+        %input.edit.form-control.hide{value: "<%- title %>"}
         %label.title <%- title %>
         %a.destroy.btn.btn-default.btn-sm.pull-right
           .glyphicon.glyphicon-trash
+
+
+
+    -# app specific js files
+    %script{src: "js/app.js"}
+
